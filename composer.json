@@ -3,10 +3,5 @@
     "require": {
         "symfony/finder": "v2.3.4"
     },
-    "authors": [
-        {
-            "name": "aoifegrey",
-            "email": "aoifegrey@gmail.com"
-        }
-    ]
+
 }
