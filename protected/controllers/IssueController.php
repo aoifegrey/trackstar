@@ -64,6 +64,7 @@ class IssueController extends Controller
 	public function actionCreate()
 	{
 		$model=new Issue;
+                $model->project_id = $this->_project->id;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -172,8 +173,43 @@ class IssueController extends Controller
 		}
 	}
         
+        /**
+         * *@var private property containing the associated Project model instance.
+         */
+        private $_project = null;
+        
+        /**
+         * * Protected method to load the associated Project model class
+         * @param integer projectId the primary identifier of the associated Project
+         * @return object the Ptoject data model based on the primary key
+         */
+        protected function loadProject($projectId) {
+            //if the project property is null, create it bsed on input id
+            if($this->_project===null)
+            {
+                $this->_project=Project::model()->findByPk($projectId);
+                if ($this->_project===null)
+                {
+                    throw new CHttpException(404, 'The requested project does not exist.');
+                }
+            }
+            return $this->_project;
+        }
+        
+        /**
+         * In-class defined filter method, configured for use in the above filters()
+         * mthod. It is called before the actionCreate() action method is run
+         * in order to ensure a proper project context
+         */
         public function filterProjectContext($filterChain)
         {
+            //set the project identifier based on GET input request variables
+            if(isset($_GET['pid']))
+                $this->loadProject ($_GET['pid']);
+            else
+                throw new CHttpException(403, 'Must specify a project before performing the action.');
+            
+            //complete the running of other filters and execute the requested action
             $filterChain->run();
-        }
+        }       
 }
